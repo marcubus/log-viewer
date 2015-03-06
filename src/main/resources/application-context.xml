@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+  
+	<bean id="filesystem" class="java.nio.file.FileSystems" factory-method="getDefault" />	
+	<bean id="watcher" class="java.nio.file.WatchService" factory-method="newWatchService" factory-bean="filesystem" />
+	<bean id="executor"	class="org.springframework.scheduling.concurrent.ThreadPoolExecutorFactoryBean">
+		<property name="corePoolSize" value="5" />
+		<property name="maxPoolSize" value="10" />
+		<property name="WaitForTasksToCompleteOnShutdown" value="true" />
+	</bean>
+	
+  <bean id="filewatcher" class="com.marcubus.nio.service.FileWatcherService">
+    <constructor-arg index="0" ref="executor" />
+    <constructor-arg index="1" ref="watcher" />
+    <constructor-arg index="2" value="src/test/resources/derp.txt" />      
+  </bean>
+	
+	<bean id="reader" class="com.marcubus.nio.LogReaderImpl">
+	  <constructor-arg index="0" ref="filewatcher" />
+		<constructor-arg index="1" value="src/test/resources/derp.txt" />
+	</bean>
+
+</beans>
